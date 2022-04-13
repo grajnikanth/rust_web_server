@@ -4,6 +4,8 @@ use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::fs;
+use std::thread;
+use std::time::Duration;
 
 fn main() {
     // Server will listen at address 127.0.0.1:7878
@@ -28,8 +30,21 @@ fn handle_connection(mut stream: TcpStream) {
 
     // Create bytes type out of the string given
     let get = b"GET / HTTP/1.1\r\n";
+    let sleep = b"GET /sleep HTTP/1.1\r\n";
+
+    // With sleep code here we are simulating the limitations of a single threaded
+    // web server where every requests waits for the first to finish before proceeding
+    // to the next. 
+
+    // We can use multi threads to avoid server waiting for a long process to finish
+    // before the next request is processed
 
     let (status_line, filename) = if buffer.starts_with(get) {
+        ("HTTP/1.1 200 OK", "hello.html")
+    }  // The below else if simulates a pause in the program execution delaying 
+    // execution of rest of the code
+    else if buffer.starts_with(sleep) {
+        thread::sleep(Duration::from_secs(5));
         ("HTTP/1.1 200 OK", "hello.html")
     } else {
         ("HTTP/1.1 404 NOT FOUND", "404.html")
