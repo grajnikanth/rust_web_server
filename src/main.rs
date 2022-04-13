@@ -29,32 +29,24 @@ fn handle_connection(mut stream: TcpStream) {
     // Create bytes type out of the string given
     let get = b"GET / HTTP/1.1\r\n";
 
-    // Check if http request is a GET / request. If it is return hello.html
-    // if not send the 404.html back with NOT FOUND status
-    if buffer.starts_with(get) {
-
-        let contents = fs::read_to_string("hello.html").unwrap();
-
-        let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}", 
-            contents.len(), contents);
-
-        //as_bytes() converts string to bytes
-        // wrtie() function sends the data via the connection
-        stream.write(response.as_bytes()).unwrap();
-        // flush makes the program wait before continuing until all the bytes are written
-        // to the connection
-        stream.flush().unwrap();
+    let (status_line, filename) = if buffer.starts_with(get) {
+        ("HTTP/1.1 200 OK", "hello.html")
     } else {
+        ("HTTP/1.1 404 NOT FOUND", "404.html")
+    };
 
-        let contents = fs::read_to_string("404.html").unwrap();
+    let contents = fs::read_to_string(filename).unwrap();
 
-        let response = format!("HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\n\r\n{}", 
-            contents.len(), contents);
+    let response = format!("{}\r\nContent-Length: {}\r\n\r\n{}", 
+        status_line,
+        contents.len(), 
+        contents);
 
-        stream.write(response.as_bytes()).unwrap();
-        stream.flush().unwrap();
-
-    }
-    
+    //as_bytes() converts string to bytes
+    // wrtie() function sends the data via the connection
+    stream.write(response.as_bytes()).unwrap();
+    // flush makes the program wait before continuing until all the bytes are written
+    // to the connection
+    stream.flush().unwrap();
 
 }
