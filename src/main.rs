@@ -30,7 +30,7 @@ fn handle_connection(mut stream: TcpStream) {
     let get = b"GET / HTTP/1.1\r\n";
 
     // Check if http request is a GET / request. If it is return hello.html
-    // if not send nothing for now
+    // if not send the 404.html back with NOT FOUND status
     if buffer.starts_with(get) {
 
         let contents = fs::read_to_string("hello.html").unwrap();
@@ -45,6 +45,14 @@ fn handle_connection(mut stream: TcpStream) {
         // to the connection
         stream.flush().unwrap();
     } else {
+
+        let contents = fs::read_to_string("404.html").unwrap();
+
+        let response = format!("HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\n\r\n{}", 
+            contents.len(), contents);
+
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
 
     }
     
