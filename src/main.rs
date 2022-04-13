@@ -3,6 +3,7 @@
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
+use std::fs;
 
 fn main() {
     // Server will listen at address 127.0.0.1:7878
@@ -30,7 +31,10 @@ fn handle_connection(mut stream: TcpStream) {
     // The below will print the request sent by a browser
     // println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
 
-    let response = "HTTP/1.1 200 OK\r\n\r\n";
+    let contents = fs::read_to_string("hello.html").unwrap();
+
+    let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}", 
+        contents.len(), contents);
 
     //as_bytes() converts string to bytes
     // wrtie() function sends the data via the connection
