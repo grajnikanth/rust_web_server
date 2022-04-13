@@ -26,21 +26,27 @@ fn handle_connection(mut stream: TcpStream) {
     // read the TCP stream data -(http request) and store it in buffer 
     stream.read(&mut buffer).unwrap();
 
-    // Convert the buffer bytes to string. from_utf..() function takes &[u8]
-    // lossy part is going to replaces an invalid sequence with "replacement character"
-    // The below will print the request sent by a browser
-    // println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+    // Create bytes type out of the string given
+    let get = b"GET / HTTP/1.1\r\n";
 
-    let contents = fs::read_to_string("hello.html").unwrap();
+    // Check if http request is a GET / request. If it is return hello.html
+    // if not send nothing for now
+    if buffer.starts_with(get) {
 
-    let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}", 
-        contents.len(), contents);
+        let contents = fs::read_to_string("hello.html").unwrap();
 
-    //as_bytes() converts string to bytes
-    // wrtie() function sends the data via the connection
-    stream.write(response.as_bytes()).unwrap();
-    // flush makes the program wait before continuing until all the bytes are written
-    // to the connection
-    stream.flush().unwrap();
+        let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}", 
+            contents.len(), contents);
+
+        //as_bytes() converts string to bytes
+        // wrtie() function sends the data via the connection
+        stream.write(response.as_bytes()).unwrap();
+        // flush makes the program wait before continuing until all the bytes are written
+        // to the connection
+        stream.flush().unwrap();
+    } else {
+
+    }
+    
 
 }
