@@ -28,6 +28,15 @@ fn handle_connection(mut stream: TcpStream) {
     // Convert the buffer bytes to string. from_utf..() function takes &[u8]
     // lossy part is going to replaces an invalid sequence with "replacement character"
     // The below will print the request sent by a browser
-    println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+    // println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+
+    let response = "HTTP/1.1 200 OK\r\n\r\n";
+
+    //as_bytes() converts string to bytes
+    // wrtie() function sends the data via the connection
+    stream.write(response.as_bytes()).unwrap();
+    // flush makes the program wait before continuing until all the bytes are written
+    // to the connection
+    stream.flush().unwrap();
 
 }
