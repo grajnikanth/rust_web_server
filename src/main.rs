@@ -14,7 +14,15 @@ fn main() {
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
-        handle_connection(stream);
+        // thread::spawn will open a new thread and execute the closure function
+        // which in this case is the code block inside the culy brackets
+        // with the below code, we now have each request from client sent
+        // to a different thread. So the /sleep won't block the other home
+        // links
+        thread::spawn(|| {
+            handle_connection(stream);
+        });
+        
     }
 
 
